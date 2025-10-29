@@ -28,17 +28,17 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function store(Request $request)
+    public function store(Request $request)
     {
-    $request->validate([
-        'nis' => 'required|unique:students',
-        'nama_lengkap' => 'required',
-        'jenis_kelamin' => 'required',
-        'nisn' => 'required|unique:students',
-    ]);
+        $request->validate([
+            'nis' => 'required|unique:students',
+            'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
+            'nisn' => 'required|unique:students',
+        ]);
 
-    Student::create($request->all());
-    return redirect()->route('admin.students.index')->with('success', 'Data berhasil disimpan!');
+        Student::create($request->all());
+        return redirect()->route('admin.students.index')->with('success', 'Data berhasil disimpan!');
     }
 
     /**
@@ -46,31 +46,37 @@ class StudentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // ✅ Tambahkan baris ini untuk mengambil data siswa
+        $student = Student::findOrFail($id);
+        return view('admin.student.show', compact('student'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-   public function edit(string $id)
+    public function edit(string $id)
     {
-    $student = Student::findOrFail($id);
-    return view('admin.student.edit', compact('student'));
+        $student = Student::findOrFail($id);
+        return view('admin.student.edit', compact('student'));
     }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-         $validated = $request->validate([
-        'nis' => 'required',
-        'nama_lengkap' => 'required',
-        'jenis_kelamin' => 'required',
-        'nisn' => 'required',
-    ]);
+        $validated = $request->validate([
+            'nis' => 'required',
+            'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
+            'nisn' => 'required',
+        ]);
 
-    $student->update($validated);
-    return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui');
+        // ✅ Tambahkan baris ini supaya $student terdefinisi
+        $student = Student::findOrFail($id);
+
+        $student->update($validated);
+        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui');
     }
 
     /**
@@ -78,6 +84,8 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $student = Student::findOrFail($id);
+        $student->delete();
+        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil dihapus');
     }
 }
